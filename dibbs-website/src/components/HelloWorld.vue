@@ -1,8 +1,18 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    
-      <button v-on:click="login">Login</button>
+     <div v-if="!$auth.loading">
+      <!-- show login when not authenticated -->
+      <button v-if="!$auth.isAuthenticated" @click="login">Log in</button>
+      <div v-if="$auth.isAuthenticated">
+
+        
+        NAME: {{ $auth.user.name }} <br>
+        {{ $auth.user.sub.split("|")[2] }}
+      </div>
+      <!-- show logout when authenticated -->
+      <button v-if="$auth.isAuthenticated" @click="logout">Log out</button>
+    </div>
   </div>
 </template>
 
@@ -15,6 +25,11 @@ export default {
   methods:{
     login:function(){
        this.$auth.loginWithRedirect();
+    },
+       logout:function(){
+       this.$auth.logout({
+        returnTo: window.location.origin
+      });
     }
 
   }

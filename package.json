@@ -1,0 +1,19 @@
+{
+  "name": "dibs-bb",
+  "version": "0.1.0",
+  "description": "Initial DIBS development",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "workspaces": [
+    "dibbs-discord-bot",
+    "dibbs-website",
+    "dibbs-backend"
+  ],
+  "dependencies": {
+    "firebase": "^9.1.3"
+  }
+}

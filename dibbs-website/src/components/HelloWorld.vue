@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>{{ test }}</h1>
     <div v-if="!$auth.loading">
       <!-- show login when not authenticated -->
       <button v-if="!$auth.isAuthenticated" @click="login">Log in</button>
@@ -17,7 +17,7 @@
 
 <script>
 const axios = require("axios");
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInWithCustomToken  } from "firebase/auth";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -39,16 +39,28 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const auth = getAuth();
 
+const auth = getAuth();
 export default {
   name: "HelloWorld",
   props: {
     msg: String,
   },
-  created: function () {
-    var user = auth.currentUser;
-
+  data:function(){return {
+    test:""
+  }},
+  mounted: function () {
+  onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const uid = user.uid;
+    this.$data.test = (uid);
+    
+                this.$store.commit("set_uid",uid);
+  } else {
+    // User is signed out
+     console.log("NOT LOGGED IN");
+  }
+});
   },
   methods: {
     login: function () {
@@ -56,31 +68,26 @@ export default {
     },
 
     fAuth: function () {
-      console.log(this.$auth.user.sub.split("|")[2]);
       axios
         .get("http://localhost:3000/authenticate", {
           params: { uid: 495586848031244299 },
         })
         .then(function (response) {
-          try {
+    
             let token = response.data;
-            firebase
-              .auth()
-              .signInWithCustomToken(token)
+            console.log(token);
+              signInWithCustomToken(auth,token)
               .then((userCredential) => {
                 // Signed in
                 var user = userCredential.user;
-                console.log(user.uid);
+                this.test = ('USER'+ user.uid);
               })
               .catch((error) => {
                 var errorCode = error.code;
                 var errorMessage = error.message;
-                // ...
+                console.log(errorMessage);
               });
-          } catch (e) {
-            window.location.replace("/");
-            return;
-          }
+        
         });
     },
 
